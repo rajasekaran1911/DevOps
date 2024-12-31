@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f8ff;
+    }
+
+    #game-container {
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      font-size: 2em;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .cell:hover {
+      background-color: #e6f7ff;
+    }
+
+    .disabled {
+      pointer-events: none;
+    }
+
+    #reset-btn {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #reset-btn:hover {
+      background-color: #0056b3;
+    }
+
+    #winner {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #28a745;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h1>Tic Tac Toe</h1>
+    <div id="board"></div>
+    <button id="reset-btn">Restart Game</button>
+    <p id="winner"></p>
+  </div>
+
+  <script>
+    const boardElement = document.getElementById('board');
+    const winnerElement = document.getElementById('winner');
+    const resetBtn = document.getElementById('reset-btn');
+
+    let currentPlayer = 'X';
+    let boardState = Array(9).fill(null); // Represents the 3x3 board
+
+    // Winning combinations
+    const winningCombinations = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+
+    // Initialize the board
+    function createBoard() {
+      boardElement.innerHTML = '';
+      boardState = Array(9).fill(null);
+      currentPlayer = 'X';
+      winnerElement.textContent = '';
+      boardElement.classList.remove('disabled');
+
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.index = i;
+        cell.addEventListener('click', handleCellClick);
+        boardElement.appendChild(cell);
+      }
+    }
+
+    // Handle cell click
+    function handleCellClick(event) {
+      const cell = event.target;
+      const index = cell.dataset.index;
+
+      // Update board state and UI
+      if (!boardState[index]) {
+        boardState[index] = currentPlayer;
+        cell.textContent = currentPlayer;
+
+        if (checkWinner()) {
+          winnerElement.textContent = `${currentPlayer} wins! 🎉`;
+          boardElement.classList.add('disabled'); // Disable further clicks
+        } else if (boardState.every(cell => cell)) {
+          winnerElement.textContent = "It's a draw! 🤝";
+        } else {
+          currentPlayer = currentPlayer === 'X' ? 'O' : 'X'; // Switch player
+        }
+      }
+    }
+
+    // Check if there is a winner
+    function checkWinner() {
+      return winningCombinations.some(combination => {
+        return combination.every(index => boardState[index] === currentPlayer);
+      });
+    }
+
+    // Reset the game
+    resetBtn.addEventListener('click', createBoard);
+
+    // Start the game on load
+    createBoard();
+  </script>
+</body>
+</html>
